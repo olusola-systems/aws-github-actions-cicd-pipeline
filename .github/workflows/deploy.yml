@@ -16,8 +16,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Deploy to EC2
-
+      - name: Copy Files To EC2
         uses: appleboy/scp-action@v0.1.7
 
         with:
@@ -28,3 +27,15 @@ jobs:
           source: "index.html"
 
           target: "/home/ec2-user/site"
+
+      - name: Deploy Website On EC2
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+
+          script: |
+            sudo cp /home/ec2-user/site/index.html /usr/share/nginx/html/index.html
+            sudo systemctl restart nginx
